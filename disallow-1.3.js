@@ -1,6 +1,6 @@
 ﻿//The MIT License (MIT)
 
-//Copyright (c) 2015 J.Hilburn
+//Copyright (c) 2015 J.Hilburn, Jacob Weigand
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,13 @@
 //THE SOFTWARE.
 
 //Written By: Jacob Weigand
-//07-02-2015
+//Last updated: 07-02-2015
 //Version: 1.3
-//Documentation: http://jhwiki.jhilburn.com/~jhilburn/index.php?title=Disallow_JQuery_Plugin
-//
-//TODO: Add a hoverover to all the disallowed targets telling the user why the target is disabled. 
-//To get nice english wording you can find the target's label element and pull the text. If the form field has a label.
+//Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
+
+
+//TODO: Add a hover over to all the disallowed targets telling the user why the target is disabled. 
+//To get nice English wording you can find the target's label element and pull the text. If the form field has a label.
 //
 (function ($) {    
     $.fn.disallow = function (variables) {
