@@ -72,7 +72,7 @@
                                 } else {
                                     allowTargets(source, target);
                                 }
-                            }).trigger("change");
+                            }).trigger("input");
                             break;
                         default:
                             console.error(target.prop('tagName') + " is unknown target input type for the disallow library");
@@ -82,6 +82,15 @@
                     console.error(source.prop('tagName') + " is unknown source type for the disallow library");
             }
         });
+
+        if ($("form.data-disallow").length === 0) {
+            $("form").addClass("data-disallow");
+            //enable all elements there were disabled by disallow on form submission. I do this so the values get submittion instead of null
+            $("form.data-disallow").on("submit", function (event) {
+                $("form.data-disallow [data-disallow-from][disabled]").removeAttr('disabled');
+            });
+        }        
+
         return this;
 
     };
@@ -123,19 +132,7 @@
 					//All disallow rules are gone from this element so we can now enable it again.
                     if (!hasDisallows(singleTarget)) {
                         singleTarget.removeAttr('disabled');
-                        singleTarget.removeAttr('readonly');
-                        singleTarget.off('.disallow-readonly');
                         singleTarget.show();
-
-                        //Special enable rules for types
-                        if (typeof singleTarget !== "undefined" && typeof singleTarget.attr("type") !== "undefined")
-                        {
-                            switch (singleTarget.attr("type").toLowerCase()) {
-                                case "checkbox":
-                                    singleTarget.css("opacity", "1");
-                                    break;
-                            }
-                        }
 						
                         //If this is a select and all options were previously disallowed then we want 
                         //to set the first enabled option as selected
@@ -167,6 +164,7 @@
                     break;
                 case "INPUT":
                     disableInput(singleTarget, disallowedValue);
+                    singleTarget.trigger("input");
                     break;
                 default:
                     console.error(singleTarget.prop('tagName') + " is unknown singleTarget type for the disallow library");
@@ -184,11 +182,10 @@
         //set the select list's value to the disallowed value if it is set, otherwise set it to empty
         if (typeof disallowedValue !== "undefined") {
             element.val(disallowedValue);
-			element.attr('readonly', 'readonly');
-			element.on("mousedown.disallow-readonly", function(event){event.preventDefault();});
-        } else {            
-			element.attr('disabled', 'disabled');
+        } else {
+            element.val("");
         }
+		element.attr('disabled', 'disabled');
     }
     
     //Disable a select list option
@@ -218,23 +215,19 @@
             case "checkbox":
                 if (typeof disallowedValue !== "undefined") {
                     inputElement.prop('checked', disallowedValue);
-					inputElement.attr('readonly', 'readonly');
-					inputElement.on("click.disallow-readonly", function(event){event.preventDefault();}).css("opacity", "0.5");
                 } else {
                     inputElement.prop('checked', false);
-					inputElement.attr("disabled", true);
                 }                
                 break;
             case "text":
                 if (typeof disallowedValue !== "undefined") {
                     inputElement.val(disallowedValue);
-					inputElement.attr('readonly', 'readonly');
                 } else {
                     inputElement.val("");
-					inputElement.attr("disabled", true);
                 }
                 break;
         }
+        inputElement.attr("disabled", true);
     }
 
     //Add a data attribute to list What elements are causing this element to me disallowed
