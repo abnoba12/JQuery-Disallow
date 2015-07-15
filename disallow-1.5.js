@@ -22,7 +22,7 @@
 
 //Written By: Jacob Weigand
 //Last updated: 07-15-2015
-//Version: 1.4
+//Version: 1.5
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
 
@@ -120,18 +120,21 @@
                     removeDisallowLabel(source, singleTarget);
                     
 					//All disallow rules are gone from this element so we can now enable it again.
-					if (!hasDisallows(singleTarget)) {
+                    if (!hasDisallows(singleTarget)) {
                         singleTarget.removeAttr('disabled');
-						singleTarget.removeAttr('readonly');
-						singleTarget.off('.disallow-readonly');
+                        singleTarget.removeAttr('readonly');
+                        singleTarget.off('.disallow-readonly');
                         singleTarget.show();
 
-						//Special enable rules for types
-						 switch (singleTarget.attr("type").toLowerCase()) {
-							case "checkbox":
-								singleTarget.css("opacity", "1");
-							break;
-						 }
+                        //Special enable rules for types
+                        if (typeof singleTarget !== "undefined" && typeof singleTarget.attr("type") !== "undefined")
+                        {
+                            switch (singleTarget.attr("type").toLowerCase()) {
+                                case "checkbox":
+                                    singleTarget.css("opacity", "1");
+                                    break;
+                            }
+                        }
 						
                         //If this is a select and all options were previously disallowed then we want 
                         //to set the first enabled option as selected
