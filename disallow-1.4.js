@@ -21,8 +21,8 @@
 //THE SOFTWARE.
 
 //Written By: Jacob Weigand
-//Last updated: 07-02-2015
-//Version: 1.3
+//Last updated: 07-15-2015
+//Version: 1.4
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
 
@@ -118,10 +118,21 @@
                 //The source did disallow this singleTarget
                 if ($.inArray(sourceName, currentDisallowsArray) !== -1) {
                     removeDisallowLabel(source, singleTarget);
-                    if (!hasDisallows(singleTarget)) {
+                    
+					//All disallow rules are gone from this element so we can now enable it again.
+					if (!hasDisallows(singleTarget)) {
                         singleTarget.removeAttr('disabled');
+						singleTarget.removeAttr('readonly');
+						singleTarget.off('.disallow-readonly');
                         singleTarget.show();
 
+						//Special enable rules for types
+						 switch (singleTarget.attr("type").toLowerCase()) {
+							case "checkbox":
+								singleTarget.css("opacity", "1");
+							break;
+						 }
+						
                         //If this is a select and all options were previously disallowed then we want 
                         //to set the first enabled option as selected
                         if (singleTarget.prop('tagName') == "OPTION" && singleTarget.parent().attr("data-disallow-all-disabled") == "true") {
@@ -169,10 +180,11 @@
         //set the select list's value to the disallowed value if it is set, otherwise set it to empty
         if (typeof disallowedValue !== "undefined") {
             element.val(disallowedValue);
-        } else {
-            element.val("");
+			element.attr('readonly', 'readonly');
+			element.on("mousedown.disallow-readonly", function(event){event.preventDefault();});
+        } else {            
+			element.attr('disabled', 'disabled');
         }
-        element.attr('disabled', 'disabled');
     }
     
     //Disable a select list option
@@ -202,19 +214,23 @@
             case "checkbox":
                 if (typeof disallowedValue !== "undefined") {
                     inputElement.prop('checked', disallowedValue);
+					inputElement.attr('readonly', 'readonly');
+					inputElement.on("click.disallow-readonly", function(event){event.preventDefault();}).css("opacity", "0.5");
                 } else {
                     inputElement.prop('checked', false);
+					inputElement.attr("disabled", true);
                 }                
                 break;
             case "text":
                 if (typeof disallowedValue !== "undefined") {
                     inputElement.val(disallowedValue);
+					inputElement.attr('readonly', 'readonly');
                 } else {
                     inputElement.val("");
+					inputElement.attr("disabled", true);
                 }
                 break;
         }
-        inputElement.attr("disabled", true);
     }
 
     //Add a data attribute to list What elements are causing this element to me disallowed
