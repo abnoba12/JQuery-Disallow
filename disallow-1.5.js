@@ -22,7 +22,7 @@
 
 //Written By: Jacob Weigand
 //Last updated: 07-15-2015
-//Version: 1.5
+//Version: 1.4
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
 
@@ -45,7 +45,7 @@
                     source.parent().on("change", function () {
                         //Condition is met so disallow our target
                         if (source.is(condition)) {
-                            disallowTargets(source, target, hide);
+                            disallowTargets(source, target, hide, disallowedValue);
                         } else {
                             allowTargets(source, target);
                         }
@@ -58,7 +58,7 @@
                             source.on("change", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
-                                    disallowTargets(source, target, hide);
+                                    disallowTargets(source, target, hide, disallowedValue);
                                 } else {
                                     allowTargets(source, target);
                                 }
@@ -68,7 +68,7 @@
                             source.on("input", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
-                                    disallowTargets(source, target, hide);
+                                    disallowTargets(source, target, hide, disallowedValue);
                                 } else {
                                     allowTargets(source, target);
                                 }
@@ -92,8 +92,9 @@
     //Call this to disallow a field
     $.disallow.manualDisallow = function (variables){
         var source = $("<input type=\"text\" name=\"" + variables.disallowName + "\"></input>");
-        variables.hide = typeof variables.hide !== "undefined" ? variables.hide : true;
-        disallowTargets(source, $(variables.target), variables.hide);
+        var hide = getHide(variables);
+        var disallowedValue = getDisallowedValue(variables);
+        disallowTargets(source, $(variables.target), hide, disallowedValue);
     }
 
     //Call this to allow a field
@@ -153,19 +154,19 @@
     }
     
     //Disallow targets
-    function disallowTargets(source, target, hide) {
+    function disallowTargets(source, target, hide, disallowedValue) {
         target.each(function () {
             var singleTarget = $(this);
             //Determine the html elment type or our singleTarget element
             switch (singleTarget.prop('tagName')) {
                 case "SELECT":
-                    disableSelect(singleTarget);
+                    disableSelect(singleTarget, disallowedValue);
                     break;
                 case "OPTION":
                     disableSelectOption(singleTarget);
                     break;
                 case "INPUT":
-                    disableInput(singleTarget);
+                    disableInput(singleTarget, disallowedValue);
                     break;
                 default:
                     console.error(singleTarget.prop('tagName') + " is unknown singleTarget type for the disallow library");
@@ -179,7 +180,7 @@
     }
 
     //Disable entire select list
-    function disableSelect(element) {
+    function disableSelect(element, disallowedValue) {
         //set the select list's value to the disallowed value if it is set, otherwise set it to empty
         if (typeof disallowedValue !== "undefined") {
             element.val(disallowedValue);
@@ -210,7 +211,7 @@
     }
 
     //Disable input
-    function disableInput(inputElement) {
+    function disableInput(inputElement, disallowedValue) {
         //Determine the input type or our inputElement element
         //then remove any user entered data
         switch (inputElement.attr("type").toLowerCase()) {
