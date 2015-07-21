@@ -43,15 +43,15 @@ This plugin only works on HTML form elements such as inputs. You can not current
 ####Supported input types####
 ```html
   <option>
-  <input type#"checkbox">
-  <input type#"text">
+  <input type="checkbox">
+  <input type="text">
 ```
 
 ####Supported target types####
 ```html
   <option>
-  <input type#"checkbox">
-  <input type#"text">  
+  <input type="checkbox">
+  <input type="text">  
   <select>  
 ```
 
