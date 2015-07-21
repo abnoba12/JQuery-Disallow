@@ -1,5 +1,5 @@
 # JQuery-Disallow
-##Licence
+##License
 The MIT License (MIT)
 
 Copyright (c) 2015 J.Hilburn, Jacob Weigand
@@ -23,7 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Disallow Plugin ##
-This is a JQuery plugin that manages the restrictions between form fields. So if a specific field or option is not allowed because some other field was selected, checked, ect then this plugin handles disabling and enabling of the dependent field. This plugin fires whenever the dependent field changes. This plugin also handles when there are multiple sources disabling a single target. Every target element maintains a stack of disallows and will not become enabled again until all the disallow sources are gone from the stack.  
+This is a JQuery plugin that manages the restrictions between form fields. If a specific field or option needs to be restricted because some other field was set to a certain value then this plugin will handle disabling and enabling the target field based on the value of the dependent field. 
+
+This plugin allows/disallows the use of the dependent field every time the source field changes based on the criteria provided. This will also handle when there is multiple sources disabling a single target. Every target element maintains a stack of disallows and the target will not become enabled again until all the disallow sources are gone from the stack.  
 
 ### Version ###
 This Documentation is for Disallow Version: 1.5.1
@@ -38,7 +40,7 @@ The latest version of this plugin can be found at https://github.com/abnoba12/JQ
 This plugin requires JQuery. This plugin has been tested with JQuery Version 1.7.1
 
 ### Limitations ###
-This plugin only works on HTML form elements such as inputs. You can not currently disable an entire div using this library. More types will be added as the need arises. The from elements must always have the type and name attribute defined.
+This plugin only works on HTML form elements such as inputs. You cannot currently disable an entire div using this library. More types will be added as the need arises. The form elements must always have the type and name attribute defined.
 
 ####Supported input types####
 ```html
@@ -69,16 +71,16 @@ This plugin only works on HTML form elements such as inputs. You can not current
 
 |Name | Type | Required/Optional | Default | Description|
 |----|----|----|----|-------|
-|condition | string | Required | N/A | This is the condition that applies to the selector disallow is attached to. If this condition returns true then it will restrict the target. This field can take any statement that is valid for [http://api.jquery.com/is/ JQuery's .is() function]. Some useful statements: ":not(any is statement)", ":checked", ":selected", ":text[value#'']"|
-|target | string | Required | N/A | This is the HTML element(s) that you want to be disabled when the condition on the source is met. This uses the same syntax as standard selectors.|
-|hide | boolean | Optional | true | When the all conditions are met and we are going to disable a target html element. If hide is true then we will disable and remove the target element(s) from view on the page. If hide is set to false then we will only disable the element(s) and not remove it from view.|
+|condition | string | required | N/A | This is the condition that applies to the selector disallow is attached to. If this condition returns true then it will restrict the target. This field can take any statement that is valid for [http://api.jquery.com/is/ JQuery's .is() function]. Some useful statements: ":not(any is statement)", ":checked", ":selected", ":text[value#'']"|
+|target | string | required | N/A | This is the HTML element(s) that you want to be disabled when the condition on the source is met. This uses the same syntax as standard selectors.|
+|hide | Boolean | Optional | true | When the all conditions are met and we are going to disable a target html element. If hide is true then we will disable and remove the target element(s) from view on the page. If hide is set to false then we will only disable the element(s) and not remove it from view.|
 |disallowedValue | variable | Optional | empty/unchecked | When the all conditions are met and we are going to disable a target html element. If disallowedValue is set then we will set the target's value to whatever is specified. When using this on checkboxes use true/false. If no value is set for disallowedVlue then the default behavior is to set the field to "" or unchecked.|
 
 ## Methods ##
 There are two methods to manually disallow or allow a form element. These would be used if you want use a complex rule that falls outside the capabilities of this plugin, but you want to maintain the ability for this plugin to stack disallows on a target and so your manual rules will interlock with other rules.
 
 ### Manually Disallow ###
-This will restrict the passed in disallow target. Make sure your "disallowName" is unique, because this can and will effect other disallow rules if they share a name.
+This will restrict the passed in disallow target. Make sure your "disallowName" is unique, because this can and will affect other disallow rules if they share a name.
 ```javascript
      $.disallow.manualDisallow({ disallowName: "Name", target: "#disallowTarget", hide: false });
 ```
