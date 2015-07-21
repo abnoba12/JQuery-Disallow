@@ -22,7 +22,7 @@
 
 //Written By: Jacob Weigand
 //Last updated: 07-15-2015
-//Version: 1.5
+//Version: 1.5.1
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
 

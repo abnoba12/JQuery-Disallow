@@ -26,7 +26,10 @@ SOFTWARE.
 This is a JQuery plugin that manages the restrictions between form fields. So if a specific field or option is not allowed because some other field was selected, checked, ect then this plugin handles disabling and enabling of the dependent field. This plugin fires whenever the dependent field changes. This plugin also handles when there are multiple sources disabling a single target. Every target element maintains a stack of disallows and will not become enabled again until all the disallow sources are gone from the stack.  
 
 ### Version ###
-This Documentation is for Disallow Version: 1.5
+This Documentation is for Disallow Version: 1.5.1
+
+#### Version Convention ####
+This plugin uses the following for its version numbers: "Major Release Number"."Minor Release number"."Bug Fix number"
 
 ### Location ###
 The latest version of this plugin can be found at https://github.com/abnoba12/JQuery-Disallow
