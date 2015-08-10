@@ -21,7 +21,7 @@
 //THE SOFTWARE.
 
 //Written By: Jacob Weigand
-//Last updated: 07-15-2015
+//Last updated: 08-10-2015
 //Version: 1.5.1
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
@@ -42,7 +42,7 @@
             //Determine the html element type or our source element
             switch (source.prop('tagName')) {
                 case "OPTION":
-                    source.parent().on("change", function () {
+                    source.parent().on("change.disallow", function () {
                         //Condition is met so disallow our target
                         if (source.is(condition)) {
                             disallowTargets(source, target, hide, disallowedValue);
@@ -55,7 +55,7 @@
                     //Determine the type of input
                     switch (source.attr("type").toLowerCase()) {
                         case "checkbox":
-                            source.on("change", function () {
+                            source.on("change.disallow", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
                                     disallowTargets(source, target, hide, disallowedValue);
@@ -65,7 +65,7 @@
                             }).trigger("change");
                             break;
                         case "text":
-                            source.on("input", function () {
+                            source.on("input.disallow", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
                                     disallowTargets(source, target, hide, disallowedValue);
@@ -86,7 +86,7 @@
         if ($("form.data-disallow").length === 0) {
             $("form").addClass("data-disallow");
             //enable all elements there were disabled by disallow on form submission. I do this so the values get submittion instead of null
-            $("form.data-disallow").on("submit", function (event) {
+            $("form.data-disallow").on("submit.disallow", function (event) {
                 $("form.data-disallow [data-disallow-from][disabled]").removeAttr('disabled');
             });
         }        
