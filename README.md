@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Disallow Plugin ##
-This is a JQuery plugin that manages the restrictions between form fields. If a specific field or option needs to be restricted because some other field was set to a certain value then this plugin will handle disabling and enabling the target field based on the value of the dependent field. 
+This is a JQuery plugin that manages the restrictions between form fields. If a specific field or option needs to be restricted because some other field was set to a certain value then this plugin will handle disabling and enabling the target field based on the value of the source field. 
 
-This plugin allows/disallows the use of the dependent field every time the source field changes based on the criteria provided. This will also handle when there is multiple sources disabling a single target. Every target element maintains a stack of disallows and the target will not become enabled again until all the disallow sources are gone from the stack.  
+This plugin allows/disallows the use of the target field every time the source field changes based on the criteria provided. This will also handle when there is multiple sources disabling a single target. Every target element maintains a stack of disallows and the target will not become enabled again until all the disallow sources are gone from the stack.  
 
 ### Version ###
 This Documentation is for Disallow Version: 1.5.1
