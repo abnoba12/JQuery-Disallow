@@ -91,6 +91,12 @@ This will remove the "disallowName" restriction from disallow target. This can a
      $.disallow.manualAllow({ disallowName: "Name", target: "#disallowTarget"});
 ```
 
+### Unbind the library ###
+If you want to remove this plugin from an element so it no longer fires when the source element meets it's condition then you can use this to unbind it's event. This will not change the target element's state. So if the target element was disabled because of a disallow event, then the target element will stay in that state after unbinding the source. The call ONLY removes the event listener for the specified source.
+```javascript
+     $(".shirtButton option[value='3']").disallowUnbind();
+```
+
 ## Examples ##
 ```javascript
 

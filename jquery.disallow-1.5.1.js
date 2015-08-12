@@ -25,29 +25,27 @@
 //Version: 1.5.1
 //Documentation: https://github.com/abnoba12/JQuery-Disallow/blob/master/README.md
 
-
-//TODO: Add a hover over to all the disallowed targets telling the user why the target is disabled. 
-//To get nice English wording you can find the target's label element and pull the text. If the form field has a label.
-//
 (function ($) {    
     $.fn.disallow = function (variables) {
-        this.each(function (index) {
+        var selector = this;
+        selector.each(function (index) {
             //determine if we are using passed in variables or data attributes
-            var condition = getCondition(variables);
-            var target = getTarget(variables);
-            var hide = getHide(variables);
-            var disallowedValue = getDisallowedValue(variables);
+            var condition = _getCondition(variables);
+            var target = _getTarget(variables);
+            var hide = _getHide(variables);
+            var disallowedValue = _getDisallowedValue(variables);
             var source = $(this);
+            var sourceName = _getSourceName(source);
 
             //Determine the html element type or our source element
             switch (source.prop('tagName')) {
                 case "OPTION":
-                    source.parent().on("change.disallow", function () {
+                    source.parent().on("change.disallow" + sourceName, function () {
                         //Condition is met so disallow our target
                         if (source.is(condition)) {
-                            disallowTargets(source, target, hide, disallowedValue);
+                            _disallowTargets(source, target, hide, disallowedValue);
                         } else {
-                            allowTargets(source, target);
+                            _allowTargets(source, target);
                         }
                     }).trigger("change");
                     break;
@@ -58,9 +56,9 @@
                             source.on("change.disallow", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
-                                    disallowTargets(source, target, hide, disallowedValue);
+                                    _disallowTargets(source, target, hide, disallowedValue);
                                 } else {
-                                    allowTargets(source, target);
+                                    _allowTargets(source, target);
                                 }
                             }).trigger("change");
                             break;
@@ -68,9 +66,9 @@
                             source.on("input.disallow", function () {
                                 //Condition is met so disallow our target
                                 if (source.is(condition)) {
-                                    disallowTargets(source, target, hide, disallowedValue);
+                                    _disallowTargets(source, target, hide, disallowedValue);
                                 } else {
-                                    allowTargets(source, target);
+                                    _allowTargets(source, target);
                                 }
                             }).trigger("input");
                             break;
@@ -83,16 +81,49 @@
             }
         });
 
+        //When a form element is disabled it submits a null value. 
+        //To prevent this I enable all elements that were disabled by disallow plugin on form submission. 
+        //This way the values get submitted instead of null values.
         if ($("form.data-disallow").length === 0) {
             $("form").addClass("data-disallow");
-            //enable all elements there were disabled by disallow on form submission. I do this so the values get submittion instead of null
             $("form.data-disallow").on("submit.disallow", function (event) {
                 $("form.data-disallow [data-disallow-from][disabled]").removeAttr('disabled');
             });
-        }        
-
+        }
         return this;
+    };
 
+    //Unbind the disallow plugin from desired element. 
+    //This unbinds all events that fire from this specific selector.
+    //You can unbind individual select options.
+    //Unbinding an element doesn't remove its enabled/disabled state. The element is left in its current state at the time of unbinding. 
+    $.fn.disallowUnbind = function () {
+        this.each(function (index) {
+            var source = $(this);
+            var sourceName = _getSourceName(source);
+
+            //Determine the html element type or our source element
+            switch (source.prop('tagName')) {
+                case "OPTION":
+                    source.parent().off("change.disallow" + sourceName);
+                    break;
+                case "INPUT":
+                    //Determine the type of input
+                    switch (source.attr("type").toLowerCase()) {
+                        case "checkbox":
+                            source.off("change.disallow");
+                            break;
+                        case "text":
+                            source.off("input.disallow");
+                            break;
+                        default:
+                            console.error(source.prop('tagName') + " is unknown target type for the disallow library");
+                    }
+                    break;
+                default:
+                    console.error(source.prop('tagName') + " is unknown type for the disallow library");
+            }
+        });
     };
 
     //-- START -- Static methods
@@ -101,22 +132,22 @@
     //Call this to disallow a field
     $.disallow.manualDisallow = function (variables){
         var source = $("<input type=\"text\" name=\"" + variables.disallowName + "\"></input>");
-        var hide = getHide(variables);
-        var disallowedValue = getDisallowedValue(variables);
-        disallowTargets(source, $(variables.target), hide, disallowedValue);
+        var hide = _getHide(variables);
+        var disallowedValue = _getDisallowedValue(variables);
+        _disallowTargets(source, $(variables.target), hide, disallowedValue);
     }
 
     //Call this to allow a field
     $.disallow.manualAllow = function (variables) {
         var source = $("<input type=\"text\" name=\"" + variables.disallowName + "\"></input>");
-        allowTargets(source, $(variables.target));
+        _allowTargets(source, $(variables.target));
     }
     //-- END -- Static methods
 
     //-- START -- reusable functions
     //Enable targets
-    function allowTargets(source, target) {
-        var sourceName = getSourceName(source);
+    function _allowTargets(source, target) {
+        var sourceName = _getSourceName(source);
         target.each(function () {
             var singleTarget = $(this);
             var currentDisallows = singleTarget.attr("data-disallow-from");
@@ -127,10 +158,10 @@
                 currentDisallowsArray = currentDisallows.split(',');
                 //The source did disallow this singleTarget
                 if ($.inArray(sourceName, currentDisallowsArray) !== -1) {
-                    removeDisallowLabel(source, singleTarget);
+                    _removeDisallowLabel(source, singleTarget);
                     
 					//All disallow rules are gone from this element so we can now enable it again.
-                    if (!hasDisallows(singleTarget)) {
+                    if (!_hasDisallows(singleTarget)) {
                         singleTarget.removeAttr('disabled');
                         singleTarget.show();
 						
@@ -151,19 +182,19 @@
     }
     
     //Disallow targets
-    function disallowTargets(source, target, hide, disallowedValue) {
+    function _disallowTargets(source, target, hide, disallowedValue) {
         target.each(function () {
             var singleTarget = $(this);
             //Determine the html elment type or our singleTarget element
             switch (singleTarget.prop('tagName')) {
                 case "SELECT":
-                    disableSelect(singleTarget, disallowedValue);
+                    _disableSelect(singleTarget, disallowedValue);
                     break;
                 case "OPTION":
-                    disableSelectOption(singleTarget);
+                    _disableSelectOption(singleTarget);
                     break;
                 case "INPUT":
-                    disableInput(singleTarget, disallowedValue);
+                    _disableInput(singleTarget, disallowedValue);
                     singleTarget.trigger("input");
                     break;
                 default:
@@ -172,13 +203,13 @@
             if (hide) {
                 singleTarget.hide();
             }
-            addDisallowLabel(source, singleTarget);
+            _addDisallowLabel(source, singleTarget);
             singleTarget.trigger("change");
         });
     }
 
     //Disable entire select list
-    function disableSelect(element, disallowedValue) {
+    function _disableSelect(element, disallowedValue) {
         //set the select list's value to the disallowed value if it is set, otherwise set it to empty
         if (typeof disallowedValue !== "undefined") {
             element.val(disallowedValue);
@@ -189,7 +220,7 @@
     }
     
     //Disable a select list option
-    function disableSelectOption(selectOption) {
+    function _disableSelectOption(selectOption) {
         //If our target was currently selected when the condition was met, move the selection to the first in the dropdown
         if (selectOption.is(":selected")) {
             selectOption.attr('selected', false).attr('disabled', 'disabled');
@@ -208,7 +239,7 @@
     }
 
     //Disable input
-    function disableInput(inputElement, disallowedValue) {
+    function _disableInput(inputElement, disallowedValue) {
         //Determine the input type or our inputElement element
         //then remove any user entered data
         switch (inputElement.attr("type").toLowerCase()) {
@@ -231,10 +262,10 @@
     }
 
     //Add a data attribute to list What elements are causing this element to me disallowed
-    function addDisallowLabel(source, target) {
+    function _addDisallowLabel(source, target) {
         var currentDisallows = target.attr("data-disallow-from");
         var currentDisallowsArray = Array();
-        var sourceName = getSourceName(source);
+        var sourceName = _getSourceName(source);
 
         if (typeof currentDisallows !== typeof undefined && currentDisallows !== false) {
             currentDisallowsArray = currentDisallows.split(',');
@@ -250,10 +281,10 @@
     }
 
     //Removed the source element from the list of data elements causing an target element from being disallowed 
-    function removeDisallowLabel(source, target) {
+    function _removeDisallowLabel(source, target) {
         var currentDisallows = target.attr("data-disallow-from");
         var currentDisallowsArray = Array();
-        var sourceName = getSourceName(source);
+        var sourceName = _getSourceName(source);
         
         if (typeof currentDisallows !== typeof undefined && currentDisallows !== false) {
             currentDisallowsArray = currentDisallows.split(',');
@@ -269,7 +300,7 @@
         }
     }
 
-    function getSourceName(source) {
+    function _getSourceName(source) {
         var sourceName = source.attr("name");
 
         if (typeof sourceName == typeof undefined || sourceName == false) {
@@ -278,7 +309,7 @@
         return sourceName;
     }
 
-    function hasDisallows(element) {
+    function _hasDisallows(element) {
         var currentDisallows = element.attr("data-disallow-from");
         if (typeof currentDisallows !== typeof undefined && currentDisallows !== false && currentDisallows != "") {
             return true;
@@ -288,7 +319,7 @@
     //-- START -- reusable functions
 
     //-- START -- Functions to determine the source of our variables. First as passed in variables, second data attributes on the HTML 
-    function getCondition(variables) {
+    function _getCondition(variables) {
         if (typeof variables !== "undefined" && variables !== null && typeof variables.condition !== "undefined" && variables.condition !== null) {
             condition = variables.condition;
         } else if ($(this).attr("data-disallow-condition") !== "undefined") {
@@ -297,7 +328,7 @@
         return condition;
     }
 
-    function getTarget(variables) {
+    function _getTarget(variables) {
         if (typeof variables !== "undefined" && variables !== null && typeof variables.target !== "undefined" && variables.target !== null) {
             target = $(variables.target);
         } else if ($(this).attr("data-disallow-target") !== "undefined") {
@@ -306,7 +337,7 @@
         return target;
     }
 
-    function getHide(variables) {
+    function _getHide(variables) {
         if ((typeof variables !== "undefined" && variables !== null && variables.hide == true) ||
                 (typeof $(this).attr("data-disallow-hide") !== "undefined" && $(this).attr("data-disallow-hide") !== null && $(this).attr("data-disallow-hide") == "true") ||
                 ((typeof variables.hide == "undefined" || variables.hide == null) && (typeof $(this).attr("data-disallow-hide") == "undefined" || $(this).attr("data-disallow-hide") == null))) {
@@ -317,7 +348,7 @@
         return hide;
     }
 
-    function getDisallowedValue(variables) {
+    function _getDisallowedValue(variables) {
         if (typeof variables !== "undefined" && variables !== null && typeof variables.disallowedValue !== "undefined" && variables.disallowedValue !== null) {
             disallowedValue = variables.disallowedValue;
         } else if ($(this).attr("data-disallow-disallowedValue") !== "undefined") {
